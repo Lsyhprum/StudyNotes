@@ -1,6 +1,6 @@
 # 算法笔记
 
-## [第1章 基本知识](https://github.com/Lsyhprum/PAT/blob/master/BASIC.md)
+### [第1章 基础知识]()
 
 ## 第2章 入门模拟
 
