@@ -10,6 +10,8 @@
 
 ### Computer Vision Algorithms and Applications
 
+#### [Learning OpenCV 3]()
+
 ### Database
 
 ### Data Structure
