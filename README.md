@@ -2,7 +2,7 @@
 
 ### Algorithms
 
-#### [算法笔记(胡凡)]()
+#### [算法笔记(胡凡)](https://github.com/Lsyhprum/StudyNotes/tree/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0)
 
 ### Android
 
