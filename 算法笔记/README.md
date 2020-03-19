@@ -1,6 +1,13 @@
 # 算法笔记
 
-### [第1章 基础知识]()
+### [第1章 基础知识](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
+
+
+
+
+
+
+
 
 ## 第2章 入门模拟
 
@@ -38,7 +45,7 @@ two pointers
 
 组合数
 
-## 第5章 [STL]()
+## [第5章 STL](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/STL..md)
 
 ## 第6章 数据结构
 

@@ -65,7 +65,39 @@ imshow("blur", blur_mat);
 
 ### 索贝尔导数
 
-Sobel 算子可以实现任意阶导数和混合偏导数
+Sobel 算子可以实现任意阶导数和混合偏导数。其求取边缘的思想原理与求边缘思想一致，此外 Sobel 算子还结合了高斯平滑滤波的思想，将边缘检测滤波器尺寸由 ksize*1 改进为 ksize*ksize，比普通方法更明显。
+
+Sobel 边缘检测算子提取图像边缘主要分为三个步骤：
+
+* 提取 X 方向边缘，X 方向一阶 Sobel 边缘检测算子：
+
+* 提取 Y 方向边缘，Y 方向一阶 Sobel 边缘检测算子：
+
+* 综合两个方向的边缘信息得到整幅图像边缘。
+
+    * 求两张图像对应像素值的绝对值之和
+
+    * 求两张图像对应像素值的平方和
+
+OpenCV Sobel()
+
+```cpp
+void cv::Sobel(InputArray  src, OutputArray  dst, int  ddepth, int  dx, int  dy, int  ksize = 3, double  scale = 1, double  delta = 0, int  borderType = BORDER_DEFAULT)
+```
+
+* ddepth: 输出图像的数量类型（深度）
+
+* dx: X 方向的差分阶数
+
+* dy: Y 方向的差分阶数
+
+* ksize: Sobel 边缘算子的尺寸，必须是 1，3，5，7
+
+* scale: 缩放因子
+
+* delta: 偏值
+
+* borderType: 像素外推法选择标志
 
 ## 图像形态学
 
