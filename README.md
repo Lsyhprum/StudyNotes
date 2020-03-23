@@ -10,7 +10,9 @@
 
 ### C/C++
 
-### [Computer Networks](https://github.com/Lsyhprum/StudyNotes/tree/master/Computer%20Network)
+### Computer Networks
+
+#### [计算机网络](https://github.com/Lsyhprum/StudyNotes/tree/master/Computer%20Network)
 
 ### Computer Architecture
 
