@@ -49,4 +49,4 @@ void copybmp(unsigned char *pOldbuf, unsigned char *pNewbuf, int OldW, int NewW,
 
 **Note**:
 
-最大子图问题？
+应用贪婪算法，先在打井费用最便宜的地打井，用已有水源的地更新没有水源的地（判断两者之间是否适合挖管道），若所有地都有水源，算法结束，否则，打下一口井
