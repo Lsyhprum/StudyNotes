@@ -32,7 +32,7 @@
 
 ### Interview
 
-#### [HDU](https://github.com/Lsyhprum/StudyNotes/tree/master/%E6%9D%AD%E7%94%B5%E7%AC%94%E8%AF%95)
+#### [HDU](https://github.com/Lsyhprum/StudyNotes/tree/master/HDU)
 
 ### JAVA
 
