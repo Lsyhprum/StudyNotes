@@ -28,7 +28,15 @@
 
 #### [深度学习之神经网络算法原理](https://github.com/Lsyhprum/StudyNotes/tree/master/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86)
 
-### Essentials of Software Engineering
+### Design Patterns
+
+#### [设计模式之禅]()
+
+### Software Engineering
+
+#### [软件工程导论](https://github.com/Lsyhprum/StudyNotes/tree/master/Essentials%20of%20Software%20Engineering)
+
+#### UML
 
 ### Interview
 

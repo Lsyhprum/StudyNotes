@@ -6,4 +6,8 @@ UML 是一种统一建模语言，为面向对象开发系统的产品进行说�
 
 UML 用 5 种不同的视图来表示一个系统：
 
-![UML]()
+![UML](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/UML.png)
+
+## 用例图
+
+描述外部执行者和系统的交互，主要元素为 **用例** 和 **执行者**

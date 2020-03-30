@@ -54,9 +54,14 @@
     
     * 过程：完成各项任务的工作步骤
 
+![IBM](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/IBM.png)
+
+![快速原型模型](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/Microsoft.png)
+
+
 * 方法学：
 
-    * 传统方法学、结构化方法学、面向数据流方法学
+    * 传统方法学（结构化方法学、面向数据流方法学）
 
     * 面向对象方法学
 
@@ -101,9 +106,9 @@
 
 * 用户需要有足够耐心，等到系统开发完成
 
-### 快速原型模式
+### 快速原型模型
 
-![]()
+![快速原型模型](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/%E5%BF%AB%E9%80%9F%E5%8E%9F%E5%9E%8B.jpg)
 
 #### 特点
 
@@ -134,6 +139,8 @@
 * 构件集成复杂且有风险
 
 ### 螺旋模型
+
+![螺旋模型]()
 
 螺旋模型的基本思想是，使用原型及其他方法尽量降低风险。可以看做在每个阶段前都增加了风险分析过程的快速原型模型。
 
