@@ -2,69 +2,25 @@
 
 ## [基础知识](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86.md)
 
-## 入门模拟
+## [入门模拟](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E5%85%A5%E9%97%A8%E6%A8%A1%E6%8B%9F.md)
 
-## 算法初步
+## [算法初步](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E5%88%9D%E6%AD%A5.md)
 
-排序
+## [数学问题](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E6%95%B0%E5%AD%A6%E9%97%AE%E9%A2%98.md)
 
-散列
+## [STL](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/STL.md)
 
-递归
+## [数据结构 —— 栈、队列、链表]()
 
-[贪心]()
+## [搜索](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E6%90%9C%E7%B4%A2.md)
 
-二分
+## [数据结构 —— 树]()
 
-two pointers
+## [数据结构 —— 图]()
 
-其他高效技巧与算法
+## [动态规划]()
 
-## 数学问题
+## [字符串]()
 
-[简单数学](https://github.com/Lsyhprum/PAT/tree/master/B1019)
-
-[最大公约数与最小公倍数](https://github.com/Lsyhprum/PAT/tree/master/C1818)
-
-分数的四则运算
-
-[*素数](https://github.com/Lsyhprum/PAT/tree/master/B1013)
-
-[质因子分解](https://github.com/Lsyhprum/PAT/tree/master/A1059)
-
-大整数运算
-
-扩展欧几里得算法
-
-组合数
-
-## [STL](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/STL..md)
-
-## 数据结构
-
-[二叉树的遍历]()
-
-[树的遍历]()
-
-平衡二叉树
-
-并查集
-
-堆
-
-哈夫曼树
-
-## 搜索
-
-## 图算法
-
-## 动态规划
-
-动态规划的递归写法和递推写法
-
-[*最大连续子序列和]()
-
-## 字符串
-
-## 专题扩展
+## [专题扩展]()
 

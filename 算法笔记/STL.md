@@ -112,3 +112,85 @@ string 长度
 将数值转化为字符串
 
 [PAT A1060]()
+
+
+# map
+
+**map 内部以红黑树实现，在建立映射的过程中自动实现从小到大的排序**
+
+## map 定义
+
+单独定义一个map:
+
+map<type1, type2> mp;
+
+**易错：**若是字符串到整形的映射，必须使用 string 不能使用 char 数组。
+
+## map 访问
+
+* 通过下标访问
+
+```cpp
+map<char, int> mp;
+mp['c'] = 20;
+cout << mp['c'];
+```
+
+* 通过迭代器访问
+
+```cpp
+for(map<char, int>::iterator it = mp.begin(); it != mp.end(); it ++){
+    cout << it->first << it->second;
+}
+```
+
+## map 添加
+
+* insert
+
+```cpp
+map.insert(pair<string, int>("test", 1));
+```
+
+* 数组方式
+
+**易错：** insert 方式键值重复时，无法插入。数组方式则会覆盖该键值对应值。
+
+## string 删除
+
+* 删除单个元素
+
+map.erase(iterator it)，时间复杂度 O(1)
+
+* 删除区间内元素
+
+map.erase(iterator first, iterator last), 左闭右开
+
+* 通过关键字删除
+
+map.erase(key)，时间复杂度 O(logN)
+
+* 删除全部元素
+
+map.clear()
+
+## map 查询
+
+* find
+
+mp.find(key), 返回迭代器，时间复杂度为 O(logN)
+
+* count
+
+mp.count(key), 判断关键字是否出现，但无法定位数据出现位置
+
+## map 其他常用方法
+
+* str.size()
+
+map 映射对数，时间复杂度 O(1)
+
+## unordered_map
+
+unordered_map 以散列代替红黑树实现，可以用来处理只映射而不排序的需求，速度比 map 快得多
+

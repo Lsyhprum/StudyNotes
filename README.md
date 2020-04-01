@@ -10,6 +10,8 @@
 
 ### C/C++
 
+### Compilers
+
 ### Computer Networks
 
 #### [计算机网络](https://github.com/Lsyhprum/StudyNotes/tree/master/Computer%20Network)
@@ -23,6 +25,8 @@
 ### Database
 
 ### Data Structure
+
+#### [数据结构](https://github.com/Lsyhprum/StudyNotes/tree/master/Data%20Structure)
 
 ### Deep Learning
 
@@ -40,6 +44,8 @@
 
 ### Interview
 
+#### [English]()
+
 #### [HDU](https://github.com/Lsyhprum/StudyNotes/tree/master/HDU)
 
 ### JAVA
@@ -54,6 +60,21 @@
 
 ### Python
 
+
+
+----
+
+TODO
+
+* [] 英语口语
+
+* [] 编译原理
+* [] 计算机组成原理
+* [] 计算机网络
+* [] 数据库
+* [] 操作系统
+
+* [] JAVA
 
 
 
