@@ -24,11 +24,17 @@
 
 ### Database
 
+#### [数据库原理]()
+
+#### [SQL]()
+
 ### Data Structure
 
 #### [数据结构](https://github.com/Lsyhprum/StudyNotes/tree/master/Data%20Structure)
 
 ### Deep Learning
+
+#### [pytorch]()
 
 #### [深度学习之神经网络算法原理](https://github.com/Lsyhprum/StudyNotes/tree/master/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86)
 
@@ -58,6 +64,8 @@
 
 ### Operating System
 
+#### [操作系统](https://github.com/Lsyhprum/StudyNotes/tree/master/Operating%20System/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F)
+
 ### Python
 
 
@@ -70,9 +78,6 @@ TODO
 
 * [] 编译原理
 * [] 计算机组成原理
-* [] 计算机网络
-* [] 数据库
-* [] 操作系统
 
 * [] JAVA
 
