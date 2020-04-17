@@ -84,3 +84,17 @@ theta: 参数（w,b)
 alpha: 学习率
 
 # loss 和 acc 区别
+
+#### 梯度消失/梯度爆炸
+
+https://www.zhihu.com/search?type=content&q=%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1
+
+# 激励函数
+
+把函数掰弯
+
+非线性拟合好
+
+cnn -relu
+
+rnn - relu / tanh
