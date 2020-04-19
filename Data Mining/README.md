@@ -24,3 +24,5 @@
 *参考*：
 
 数据挖掘：概念与技术，韩家炜
+
+[数据挖掘：理论与算法](https://www.bilibili.com/video/BV154411Q7mG?p=11)
