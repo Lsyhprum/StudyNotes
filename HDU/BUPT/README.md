@@ -41,3 +41,19 @@ long long 要用就尽可能都用
 1384
 
 # define LL long long 
+
+1559
+
+s.insert(pos, s);  插入到 pos 位置
+
+
+1654 
+
+再做一遍 
+还有其他解法
+
+1655
+
+const int NA=1<<30;
+
+记得邻接表记得清空 map 中 的 vector
