@@ -22,7 +22,7 @@ Entity Relationship Diagram，描绘数据对象及数据对象之间的关系�
 
 描绘系统各种状态和不同状态间转换的方式。
 
-![ERD](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/STD.png)
+![ERD](./pic/STD.png)
 
 ## 数据规范化
 
@@ -39,17 +39,3 @@ Entity Relationship Diagram，描绘数据对象及数据对象之间的关系�
 * 范式越高，访问表增多，性能下降
 
 **大多数场合选用 第三范式 比较恰当**
-
-## 面向对象分析方法
-
-基本步骤
-
-* 定义系统的用例
-
-* 建立类对象模型
-
-* 建立对象-关系模型
-
-* 建立对象-行为模型
-
-* 编写 SRS

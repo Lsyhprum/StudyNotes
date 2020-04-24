@@ -12,3 +12,8 @@
 
 ### [面向对象设计](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/Chapter7.md)
 
+
+*参考：*
+[细数软件工程各阶段必不可少的那些图](https://zhuanlan.zhihu.com/p/104451452)
+
+[软件工程研究生复试知识点总结](https://www.jianshu.com/p/6b73132cccde)

@@ -2,9 +2,9 @@
 
 ## 软件
 
-软件是计算机系统中与硬件相互依存的另一部分，是包括程序，数据及相关文档的完整集合。
+* 软件是计算机系统中与硬件相互依存的另一部分
 
-**Software = Program + Data + Document**
+* Software = Program + Data + Document
 
 ## 软件危机
 
@@ -31,20 +31,15 @@
     * 软件 != 程序
     * 轻视软件维护
 
-### 解决
-
-* 组织
-    * 工程项目管理**方法**
-
-* 技术措施
-    * 软件开发**过程**
-    * 软件开发**工具**
-
 ## 软件工程
 
 * 定义：
 
     开发、运行和维护软件的系统方法。
+
+## 软件工程方法学
+
+软件生命周期全过程中使用的一整套技术方法的集合成为方法学
 
 * 三要素：
 
@@ -52,18 +47,18 @@
     
     * 工具：自动或半自动的软件工程支撑环境
     
-    * 过程：完成各项任务的工作步骤
+    * 过程：完成各项任务的工作步骤，将软件工程的方法和工具综合起来达到合理、及时进行软件开发的目的
 
-![IBM](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/IBM.png)
+![IBM](./pic/IBM.png)
 
 ![快速原型模型](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/Microsoft.png)
 
 
 * 方法学：
 
-    * 传统方法学（结构化方法学、面向数据流方法学）
+    * 传统方法学（结构化方法学、面向数据流方法学、生命周期方法学）：将软件生命周期分为若干阶段，每个阶段相对独立
 
-    * 面向对象方法学
+    * 面向对象方法学：以数据为主线，把数据和对数据的操作结合起来
 
 * 与计算机科学的区别：
 
@@ -108,7 +103,7 @@
 
 ### 快速原型模型
 
-![快速原型模型](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/%E5%BF%AB%E9%80%9F%E5%8E%9F%E5%9E%8B.jpg)
+![快速原型模型](./pic/%E5%BF%AB%E9%80%9F%E5%8E%9F%E5%9E%8B.jpg)
 
 #### 特点
 
@@ -140,7 +135,7 @@
 
 ### 螺旋模型
 
-![螺旋模型]()
+![螺旋模型](./pic/螺旋模型.jpg)
 
 螺旋模型的基本思想是，使用原型及其他方法尽量降低风险。可以看做在每个阶段前都增加了风险分析过程的快速原型模型。
 

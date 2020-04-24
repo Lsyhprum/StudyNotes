@@ -20,7 +20,7 @@
 
 #### 耦合
 
-![coupling](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/coupling.png)
+![coupling](./pic/coupling.png)
 
 * 内容耦合：一个模块直接修改或操作另一个模块的数据
 
@@ -34,7 +34,7 @@
 
 #### 内聚
 
-![cohesion](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/cohesion.png)
+![cohesion](./pic/cohesion.png)
 
 模块之内个成分之间相互依赖程度的度量
 
