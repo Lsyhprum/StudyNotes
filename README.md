@@ -28,9 +28,7 @@
 
 #### [数据库原理]()
 
-#### [SQL]()
-
-#### [MySQL]()
+#### [MySQL](./Database/MySQL)
 
 ### Data Structure
 
@@ -53,8 +51,6 @@
 #### UML
 
 ### Interview
-
-#### [English]()
 
 #### [HDU](https://github.com/Lsyhprum/StudyNotes/tree/master/HDU)
 

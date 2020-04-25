@@ -4,7 +4,7 @@
 
 ## [感知机](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/Chapter2.md)
 
-## [k 近邻法]()
+## [k 近邻法](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/Chapter3.ipynb)
 
 ## [朴素贝叶斯]()
 
