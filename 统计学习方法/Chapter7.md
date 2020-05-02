@@ -1,4 +1,19 @@
 
+SVM 有三宝：间隔、对偶、核技巧
+
+SVM: hard-margin SVM   soft-margin SVM  kernel SVM
+
+hard-margin SVM 最大间隔分类器
+
+
+
+
+
+
+
+
+
+
 支持向量机(support vector machines)是一种二分类模型，基本模型是定义在特征空间上的 **间隔最大的** 线性分类器。
 
 <div align="center"> <img src="./pic/v2-0d6eb1459f72940dc932795f345bae06_b.jpg" width="300"/> </div><br>
