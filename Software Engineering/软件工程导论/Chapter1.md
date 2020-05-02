@@ -51,7 +51,7 @@
 
 ![IBM](./pic/IBM.png)
 
-![快速原型模型](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/Microsoft.png)
+![快速原型模型](./pic/Microsoft.png)
 
 
 * 方法学：

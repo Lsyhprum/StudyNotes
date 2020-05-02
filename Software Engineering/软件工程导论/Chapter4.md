@@ -2,7 +2,7 @@
 
 ## 软件设计
 
-![](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/design.png)
+![](./pic/design.png)
 
 * 概要设计：将软件需求转化为数据结构和软件的系统结构，即系统模块划分。
 

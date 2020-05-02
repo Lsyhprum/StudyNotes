@@ -12,7 +12,7 @@
 
 Entity Relationship Diagram，描绘数据对象及数据对象之间的关系，是按照用户的观点对数据建立的模型，反映了用户的现实环境。
 
-![ERD](https://github.com/Lsyhprum/StudyNotes/blob/master/Essentials%20of%20Software%20Engineering/pic/ERD.png)
+![ERD](./pic/ERD.png)
 
 ### 数据流图 DFD
 
