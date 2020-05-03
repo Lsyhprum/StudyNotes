@@ -1,0 +1,4 @@
+
+
+*参考*：
+[Android 操作系统架构开篇](http://gityuan.com/android/)
