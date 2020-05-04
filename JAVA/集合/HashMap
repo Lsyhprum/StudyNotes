@@ -1,0 +1,26 @@
+HashMap HashTable
+
+ HashMap和Hashtable都实现了Map接口，但决定用哪一个之前先要弄清楚它们之间的分别。主要的区别有：线程安全性，同步(synchronization)，以及速度。
+
+ HashMap几乎可以等价于Hashtable，除了HashMap是非synchronized的，并可以接受null(HashMap可以接受为null的键值(key)和值(value)，而Hashtable则不行)。
+
+HashMap是非synchronized，而Hashtable是synchronized，这意味着Hashtable是线程安全的，多个线程可以共享一个Hashtable；而如果没有正确的同步的话，多个线程是不能共享HashMap的。Java 5提供了ConcurrentHashMap，它是HashTable的替代，比HashTable的扩展性更好。
+
+
+另一个区别是HashMap的迭代器(Iterator)是fail-fast迭代器，而Hashtable的enumerator迭代器不是fail-fast的。
+
+由于Hashtable是线程安全的也是synchronized，所以在单线程环境下它比HashMap要慢。如果你不需要同步，只需要单一线程，那么使用HashMap性能要好过Hashtable。
+
+
+对象是否会被回收的两个经典算法：引用计数法，和可达性分析算法。
+
+引用计数法
+
+简单的来说就是判断对象的引用数量。实现方式：给对象共添加一个引用计数器，每当有引用对他进行引用时，计数器的值就加1，当引用失效，也就是不在执行此对象是，他的计数器的值就减1，若某一个对象的计数器的值为0，那么表示这个对象没有人对他进行引用，也就是意味着是一个失效的垃圾对象，就会被gc进行回收。
+
+　但是这种简单的算法在当前的jvm中并没有采用，原因是他并不能解决对象之间循环引用的问题。
+
+
+因为引用计数法的缺点有引入了可达性分析算法，通过判断对象的引用链是否可达来决定对象是否可以被回收。
+
+
