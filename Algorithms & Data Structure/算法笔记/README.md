@@ -4,7 +4,7 @@
 
 * [入门模拟](https://github.com/Lsyhprum/StudyNotes/blob/master/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E5%85%A5%E9%97%A8%E6%A8%A1%E6%8B%9F.md)
 
-* [算法初步]()
+* [算法初步]https://github.com/Lsyhprum/StudyNotes/blob/master/Algorithms%20%26%20Data%20Structure/%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/%E7%AE%97%E6%B3%95%E5%88%9D%E6%AD%A5.md()
 
 * [数学问题]()
 
