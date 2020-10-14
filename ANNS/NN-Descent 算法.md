@@ -1,57 +1,55 @@
 # NN-Descent 算法
 
-相关论文：[Efficient K-Nearest Neighbor Graph Construction for Generic Similarity Measures]()
+>@inproceedings{DBLP:conf/www/DongCL11,
+>  author    = {Wei Dong and
+>               Moses Charikar and
+>               Kai Li},
+>  editor    = {Sadagopan Srinivasan and
+>               Krithi Ramamritham and
+>               Arun Kumar and
+>               M. P. Ravindra and
+>               Elisa Bertino and
+>               Ravi Kumar},
+>  title     = {Efficient k-nearest neighbor graph construction for generic similarity
+>               measures},
+>  booktitle = {Proceedings of the 20th International Conference on World Wide Web,
+>               {WWW} 2011, Hyderabad, India, March 28 - April 1, 2011},
+>  pages     = {577--586},
+>  publisher = {{ACM}},
+>  year      = {2011},
+>  url       = {https://doi.org/10.1145/1963405.1963487},
+>  doi       = {10.1145/1963405.1963487},
+>  timestamp = {Tue, 06 Nov 2018 16:57:07 +0100},
+>  biburl    = {https://dblp.org/rec/conf/www/DongCL11.bib},
+>  bibsource = {dblp computer science bibliography, https://dblp.org}
+>}
 
-**NN-Descent 算法** 是一种构建 **近似 K 近邻图** 的算法。主要用于解决之前基于 K 近邻图的几种算法所存在的问题，以下是论文中提到的 4 个缺点：
 
-* 时间复杂度高: Brute-force 时间复杂度为 $O(n^2)$, 不适合大数据集
-* 标准适用情形少：只适用特定相似度度量标准
-* 不支持并行计算：构建全局索引难以进行并行计算
-* 计算成本高：LSH 为了获得精确结果需要付出较高计算成本，且对于不同相似度度量标准需设计不同散列函数
 
-NN-Descent 致力于达成通用、可拓展、节省空间、快速、简单的算法。该算法主要思想十分简单：**邻居的邻居更可能是邻居**。即在初始 K-NN 图中，通过探索每个点的 **邻居的邻居** 来提升结果的召回率。
+### Introduction
 
-## 理论推导
+**NN-Descent 算法** 是一种构建 **近似 K 近邻图** 的算法。主要用于解决之前基于 K 近邻图算法的几个缺陷：
 
-K = c^3
+* 时间复杂度高: Brute-force 时间复杂度为 $O(n^2)$, 不适合大数据集; NN-Descent 时间复杂度为 $O(n^{1.11})$ 到 $O(n^{1.14})$ 之间。
+* 标准适用情形少：很多近邻搜索算法只适用特定相似度度量标准；NN-Descent 适用于任意度量标准。
+* 不支持并行计算：构建全局索引难以进行并行计算; NN-Descent 通过局部搜索避免依赖全局索引。
+* 计算成本高：LSH 为了获得精确结果需要付出较高计算成本，且对于不同相似度度量标准需设计不同散列函数。
 
-对于数据集 V，构建初始近似 K-NN 图 B。对于其中一个数据点 v，B[v] 表示 v 的 K 个最近邻，B'[v] 表示 v 的邻居的邻居的集合。
+NN-Descent 主要思想十分简单：**邻居的邻居很可能是邻居**。即在初始 K-NN 图中，通过探索每个点的 **邻居的邻居** 来提升结果的召回率。
 
-在此证明通过 NN-descent 算法将 v 的 K 近邻最大距离减半的可能性：
+### Algorithm
 
-对于 $B_{r/2}(v)$ 中的一点 u, 假设从 B'[v] 中找到至少一点 v' 满足 $v' \in B_{r/2}(v)$ 可得:
+#### 基础算法——我的邻居的邻居可能是我的邻居
 
-* $v' \in B_r(v), P{v' \in B[v]} \ge K/|B_r(v)|$
-  * 若 v 的 K 个邻居都在 $B_r(v)$ 中取的话，则共有 $\sum^K_{|B_r(v)|}$ 种情况，而 $B_r(v)$ 中存在一点不是 v 的邻居的情况有 $\sum^K_{|B_r(v)|-1}$ 种情况。$B_r(v)$ 中存在一点不是 v 的邻居的概率为 $\frac{\sum^K_{|B_r(v)|-1}}{\sum^K_{|B_r(v)|}}$，即 $\frac{|B_r(v)|-K}{|B_r(v)|}$
-  * $B_r(v)$ 中一点是 v 的邻居的概率为 $1-\frac{|B_r(v)|-K}{|B_r(v)|}$，即 $\frac{K}{|B_r(v)|}$
-  * 故 v' 是 v 的邻居的概率大于等于 $K/|B_r(v)|$
-* $d(u,v') \le d(u,v) + d(v, v') \le r, P{u \in B[v']} \ge \frac{K}{B_r(v')}$
-  * $B_r(v')$ 中一点是 v' 的邻居的概率为 $\frac{K}{|B_r(v')|}$
-  * u 与 v' 的距离小于 r, 故 u 是 v' 的邻居的概率大于等于 $\frac{K}{|B_r(v')|}$
-* $|B_r(v)| \le c|B_{\frac{r}{2}}(v)|, |B_r(v')| \le c|B_{\frac{r}{2}}(v')| \le c|B_r(v)| \le c^2|B_{r/2}(v)|$
-  
-
-由以上 3 个不等式和各事件的独立性可得：
-
-$P{v' \in B[v] ^ u \in B[v']} \ge K/|B_{r/2}(v)|^2$
-
-即对于 v' , 它既是 v 的邻居又是 u 的方向邻居的概率大于等于 K/|B_r/2(v)|^2
-
-...
-
-只要取足够大的 K，就可以通过探索每个对象邻居的邻居来达到构建高质量近似 K 近邻图的作用。
-
-## 算法
-
-### 基础算法
+NN-Descent 算法在离线构建阶段首先对每个点 **随机选取** K近邻，之后迭代筛选出更优的邻居的邻居，来替代 KNN 和 反向 KNN 的候选集。当没有明显提高时终止迭代。
 
 ```
 Data: dataset V, similarity oracle σ, K 
 Result: K-NN list B                        // 候选集
 begin 
-  B[v] ←− Sample(V,K) × {∞}, ∀v ∈ V 
+  B[v] ←− Sample(V,K) × {∞}, ∀v ∈ V 	  // 随机抽选 k 个入口点
   loop 
-    R ←− Reverse(B) 
+    R ←− Reverse(B) 					   // 更新反向集，即更新无向图 
     B1[v] ←− B[v] ∪ R[v], ∀v ∈ V;        // 将 v 候选集和 包含 v 的反向集混合
     c ←− 0                                 // update counter 
     for v ∈ V do 
@@ -73,83 +71,102 @@ function UpdateNN(H, <u, l, . . .>)        // 更新候选集
   return 1 if changed, or 0 if not.
 ```
 
-### 算法改进
+#### 局部连接——介绍我的邻居了解彼此
 
-#### 局部连接
+探索邻居的邻居可以通过局部连接来优化替代，以避免 **冗余计算**，提高效率。局部连接对邻居集内每一对不同的邻居进行相似度计算，并更新每对邻居各自的邻居集。
 
-让每一个对象探索它邻居的邻居的操作也可通过局部连接等价实现。局部连接可这样理解：给定一点v，它的邻居集为B¯¯¯¯[v]，在B¯¯¯¯[v]上的局部连接是计算每一对不同的p和q之间的相似性（p，q∈B¯¯¯¯[v]），并且根据此相似性更新B[p]与B[q]。通俗的将，局部连接就是每一个点介绍它的邻居去了解彼此。
+举个栗子：
 
-局部连接能代替一个对象探索它邻居的邻居的操作吗？看下面的示例：
-
-[]()
-
-如图2所示，b∈BK(a)，c∈BK(b)。在算法1中，当探索到a时，我们需要比较a与c，当探索到c时，我们也需要比较a与c，这是 **冗余计算** 的一种情况，可通过索引编号的顺序来解决。同样地，a与c之间的比较可通过对B¯¯¯¯[b]进行局部连接来实现。
+在 基础算法 中，基础关系为 a -> b -> c，b∈B(a)，c∈B(b)，当探索到 a 时，我们需要比较 a 与 c，当探索到 c 时，我们也需要比较 a 与 c。同样地，a与c之间的比较可通过对B[b]进行局部连接来实现，即 b <- a -> c。
 
 局部连接实现起来很简单，那么它有什么好处呢？
 
-增强了数据的局部性，使执行更有效。如果每一个对象的邻居的个数平均为K¯¯¯¯¯，算法1每次迭代探索每一个对象的邻居的邻居时将接触到K¯¯¯¯¯2个点，而局部连接只需要接触K¯¯¯¯¯个点。
-单机实施时，提升了cache的命中率，从而加速了K近邻图的构建。分布式实施时，能减少机器之间数据的复制。
+* **减少算法复杂度**。如果每一个对象的邻居的个数平均为 K，基础算法每次迭代探索每一个对象的邻居的邻居时将接触到 K^2 个点，而局部连接只需要接触 K 个点。
+
+* **提升 Cache 命中率/减少数据复制**。单机部署时，运用 Cache 访问的局部性原理，从而加速了 K 近邻图的构建。分布式实施时，能减少机器之间数据的复制。
 
 
-#### 增量搜索
+#### 增量搜索——见过面的邻居记下他的名字
 
 随着算法的执行，每一个对象的K近邻更新的幅度逐渐减小。而且，在某次迭代中参与比较的两个点，就更可能在之前的迭代中已经比较过了。这就造成冗余计算，而增量搜索就是要解决这个问题的。
 
 给每一个点的K近邻列表中的每一个对象附加一个布尔标记，当一个新对象插入到该列表中的某个条目时，它的标记初始化为true。
-只有当两个对象至少一个的标记为true，它们才进行局部连接。一个对象参与局部连接之后，它被标记为false（true变false，false还是false）。
+只有当两个对象至少一个的标记为 true，它们才进行局部连接。一个对象参与局部连接后，它被标记为 false。
 
-#### 采样
+
+#### 采样——抽选部分邻居了解彼此
 
 采样是为了解决以下两个问题：
 
-局部连接的高成本。一次迭代，就算只考虑K近邻，时间复杂度为K2N，如果再考虑反向近邻，时间复杂度更高。
-冗余计算。两个点同时连接到多个不同对象，这两个点将比较多次。
-使用采样来缓解这两个问题的具体方案如下：
+* 局部连接的高成本。一次迭代，就算只考虑K近邻，时间复杂度为K^2N，如果再考虑反向近邻，时间复杂度更高。
+* 冗余计算。两个点同时连接到多个不同对象，这两个点将比较多次。
 
-邻居取样。局部连接之前，对用于局部连接的每一个对象，从标记为true的K近邻中取样ρK个对象（ρ∈(0,1]）。每一次迭代，仅仅这些被取出的数据被标记为false。
-反向邻居。只根据取样对象和标记为false的对象来构建反向邻居列表。对构建得的反向邻居列表再次取样。
-在标记为true对象之间进行局部连接，以及在标记为true对象与标记为false对象之间进行局部连接。
-因此，我们就可以通过取样率ρ来进行精度和速度的trade-off。
+选取部分未标记的邻居进行局部连接。只根据取样对象和标记为false的对象来构建反向邻居列表。对构建得的反向邻居列表再次取样。
+因此，我们就可以通过取样率 ρ 来进行精度和速度的 trade-off。
 
 
-#### 提前终止
+#### 提前终止——DONE IS BETTER THAN PERFECT
 
-一个很自然的终止标准是：某次迭代中，K近邻图不再被改善。实际上，开始迭代时，K近邻图能充分的更新，而随着迭代的进行，K近邻图更新的次数快速收缩，此时的迭代就显得意义不大了，考虑到迭代的计算成本，这些迭代其实没必要执行。为了解决这个问题，本文采取的方案是：在每次迭代中，统计所有对象K近邻列表更新的次数count，当count<δKN时终止发生，其中δ是精度参数，它粗略反应了由于提前终止允许错过的真正的K近邻的比例。
+基础算法中，K近邻图不再被改善则算法终止。实际上，开始迭代时，K近邻图能充分的更新，而随着迭代的进行，需要更多次迭代才能获得略微的提升，此时的迭代就显得意义不大了，考虑到迭代的计算成本，这些迭代其实没必要执行。为了解决这个问题，本文采取的方案是：在每次迭代中，统计所有对象K近邻列表更新的次数 count，当 count < δKN 时终止程序继续执行。
 
-### 完整算法
+其中 δ是精度参数，它粗略反应了由于提前终止允许错过的真正的K近邻的比例。
+
+#### 完整算法
 
 ```
-Data: dataset V, similarity oracle σ, K, ρ, δ 
+Data: dataset V, similarity oracle σ, K, ρ, δ // ρ 取样率、δ 精度参数
 Result: K-NN list B 
 begin 
   B[v] ←− Sample(V,K) × {<∞, true>} ∀v ∈ V 
   loop 
-    parallel for v ∈ V do 
-      old[v] ←− all items in B[v] with a false flag 
-      new[v] ←− ρK items in B[v] with a true flag 
+    parallel for v ∈ V do 						// 并行计算
+
+      // 优化后的算法将候选池根据是否访问过分为两部分
+      old[v] ←− all items in B[v] with a false flag // 增量搜索
+      new[v] ←− ρK items in B[v] with a true flag   // 采样
       Mark sampled items in B[v] as false;
 
-    old′ ← Reverse(old), new′ ← Reverse(new) 
+    old′ ← Reverse(old), new′ ← Reverse(new) 		// 更新反向集
     c ←− 0 //update counter 
     
     parallel for v ∈ V do 
-      old[v] ←− old[v] ∪ Sample(old′[v], ρK) 
+      old[v] ←− old[v] ∪ Sample(old′[v], ρK) 		// 更新增量搜索列表
       new[v] ←− new[v] ∪ Sample(new′[v], ρK) 
-      for u1, u2 ∈ new[v], u1 < u2 or u1 ∈ new[v], u2 ∈ old[v] do 
-      l ←− σ(u1, u2) // c and B[.] are synchronized.
-      c ←− c+UpdateNN(B[u1], <u2, l, true>)
-      c ←− c+UpdateNN(B[u2], <u1, l, true>)
-    return B if c < δNK
+      for u1, u2 ∈ new[v], u1 < u2 or u1 ∈ new[v], u2 ∈ old[v] do 		// 局部连接
+      	l ←− σ(u1, u2) // c and B[.] are synchronized.
+      	c ←− c+UpdateNN(B[u1], <u2, l, true>)
+      	c ←− c+UpdateNN(B[u2], <u1, l, true>)
+    return B if c < δNK								// 提前终止
 ```
 
-## Map-Reduce 实现
 
-## 总结
+### Experimental 
+
+本文提出了几个实验中具体考量的问题，可以作为论文实验部分架构的思考方向：
+
+* 本算法的具体表现
+
+* 本算法与其他算法的比较
+
+* 精确度和查询花费与数据集规模的关系
+
+* 如何选取适合的参数
+
+* 本征维度如何影响算法的性能
+
+
+### Conclusions
+
+* 优点：时间复杂度较低, 在大多数数据集上为 O(n^1.14)，且易于并行化实现。
+* 缺点：NN-Descent 在 本征维度较高 的数据集上表现较差，其适用于本征维度较低**(20) 的数据集。事实上真实数据集的本征维度大多都具有较低的本征维度。
 
 
 
 *参考*：
 
+[efanna_graph](https://github.com/ZJULearning/efanna_graph)
+
 [NN-Descent构建K近邻图——论文超详细注解](https://blog.csdn.net/whenever5225/article/details/105598694)
+
 
 
