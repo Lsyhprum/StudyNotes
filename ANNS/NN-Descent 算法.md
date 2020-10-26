@@ -1,28 +1,30 @@
 # NN-Descent 算法
 
->@inproceedings{DBLP:conf/www/DongCL11,
->  author    = {Wei Dong and
->               Moses Charikar and
->               Kai Li},
->  editor    = {Sadagopan Srinivasan and
->               Krithi Ramamritham and
->               Arun Kumar and
->               M. P. Ravindra and
->               Elisa Bertino and
->               Ravi Kumar},
->  title     = {Efficient k-nearest neighbor graph construction for generic similarity
->               measures},
->  booktitle = {Proceedings of the 20th International Conference on World Wide Web,
->               {WWW} 2011, Hyderabad, India, March 28 - April 1, 2011},
->  pages     = {577--586},
->  publisher = {{ACM}},
->  year      = {2011},
->  url       = {https://doi.org/10.1145/1963405.1963487},
->  doi       = {10.1145/1963405.1963487},
->  timestamp = {Tue, 06 Nov 2018 16:57:07 +0100},
->  biburl    = {https://dblp.org/rec/conf/www/DongCL11.bib},
->  bibsource = {dblp computer science bibliography, https://dblp.org}
->}
+```
+@inproceedings{DBLP:conf/www/DongCL11,
+  author    = {Wei Dong and
+               Moses Charikar and
+               Kai Li},
+  editor    = {Sadagopan Srinivasan and
+               Krithi Ramamritham and
+               Arun Kumar and
+               M. P. Ravindra and
+               Elisa Bertino and
+               Ravi Kumar},
+  title     = {Efficient k-nearest neighbor graph construction for generic imilarity
+               measures},
+  booktitle = {Proceedings of the 20th International Conference on World ide Web,
+               {WWW} 2011, Hyderabad, India, March 28 - April 1, 2011},
+  pages     = {577--586},
+  publisher = {{ACM}},
+  year      = {2011},
+  url       = {https://doi.org/10.1145/1963405.1963487},
+  doi       = {10.1145/1963405.1963487},
+  timestamp = {Tue, 06 Nov 2018 16:57:07 +0100},
+  biburl    = {https://dblp.org/rec/conf/www/DongCL11.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+```
 
 
 
@@ -139,6 +141,238 @@ begin
     return B if c < δNK								// 提前终止
 ```
 
+#### 源码解析
+
+构建索引阶段
+```cpp
+void IndexGraph::Build(size_t n, const float *data, const Parameters &parameters) {
+  ...
+
+  // 入口点策略 -> 随机入口点
+  InitializeGraph(parameters);
+
+  // NN-Descent 核心代码
+  NNDescent(parameters);
+
+  final_graph_.reserve(nd_);
+  unsigned K = parameters.Get<unsigned>("K");
+  for (unsigned i = 0; i < nd_; i++) {
+    std::vector<unsigned> tmp;
+
+    // 裁边策略 -> 选取前 K 个近邻
+    std::sort(graph_[i].pool.begin(), graph_[i].pool.end());
+    for (unsigned j = 0; j < K; j++) {
+      tmp.push_back(graph_[i].pool[j].id);
+    }
+    tmp.reserve(K);
+    final_graph_.push_back(tmp);
+    ...
+  }
+  ...
+}
+
+void IndexGraph::InitializeGraph(const Parameters &parameters) {
+
+  const unsigned L = parameters.Get<unsigned>("L");
+  const unsigned S = parameters.Get<unsigned>("S");
+
+  graph_.reserve(nd_);
+  std::mt19937 rng(rand());
+  for (unsigned i = 0; i < nd_; i++) {
+    graph_.push_back(nhood(L, S, rng, (unsigned) nd_));
+  }
+#pragma omp parallel for
+  for (unsigned i = 0; i < nd_; i++) {
+    const float *query = data_ + i * dimension_;
+    std::vector<unsigned> tmp(S + 1);
+    initializer_->Search(query, data_, S + 1, parameters, tmp.data());
+
+    for (unsigned j = 0; j < S; j++) {
+      unsigned id = tmp[j];
+      if (id == i)continue;
+      float dist = distance_->compare(data_ + i * dimension_, data_ + id * dimension_, (unsigned) dimension_);
+
+      graph_[i].pool.push_back(Neighbor(id, dist, true));
+    }
+    std::make_heap(graph_[i].pool.begin(), graph_[i].pool.end());
+    graph_[i].pool.reserve(L);
+  }
+}
+
+void IndexGraph::join() {
+#pragma omp parallel for default(shared) schedule(dynamic, 100)
+  for (unsigned n = 0; n < nd_; n++) {
+    graph_[n].join([&](unsigned i, unsigned j) {
+      if(i != j){
+        float dist = distance_->compare(data_ + i * dimension_, data_ + j * dimension_, dimension_);
+        graph_[i].insert(j, dist);
+        graph_[j].insert(i, dist);
+      }
+    });
+  }
+}
+void IndexGraph::update(const Parameters &parameters) {
+  unsigned S = parameters.Get<unsigned>("S");
+  unsigned R = parameters.Get<unsigned>("R");
+  unsigned L = parameters.Get<unsigned>("L");
+#pragma omp parallel for
+  for (unsigned i = 0; i < nd_; i++) {
+    std::vector<unsigned>().swap(graph_[i].nn_new);
+    std::vector<unsigned>().swap(graph_[i].nn_old);
+    //std::vector<unsigned>().swap(graph_[i].rnn_new);
+    //std::vector<unsigned>().swap(graph_[i].rnn_old);
+    //graph_[i].nn_new.clear();
+    //graph_[i].nn_old.clear();
+    //graph_[i].rnn_new.clear();
+    //graph_[i].rnn_old.clear();
+  }
+#pragma omp parallel for
+  for (unsigned n = 0; n < nd_; ++n) {
+    auto &nn = graph_[n];
+    std::sort(nn.pool.begin(), nn.pool.end());
+    if(nn.pool.size()>L)nn.pool.resize(L);
+    nn.pool.reserve(L);
+    unsigned maxl = std::min(nn.M + S, (unsigned) nn.pool.size());
+    unsigned c = 0;
+    unsigned l = 0;
+    //std::sort(nn.pool.begin(), nn.pool.end());
+    //if(n==0)std::cout << nn.pool[0].distance<<","<< nn.pool[1].distance<<","<< nn.pool[2].distance<< std::endl;
+    while ((l < maxl) && (c < S)) {
+      if (nn.pool[l].flag) ++c;
+      ++l;
+    }
+    nn.M = l;
+  }
+#pragma omp parallel for
+  for (unsigned n = 0; n < nd_; ++n) {
+    auto &nnhd = graph_[n];
+    auto &nn_new = nnhd.nn_new;
+    auto &nn_old = nnhd.nn_old;
+    for (unsigned l = 0; l < nnhd.M; ++l) {
+      auto &nn = nnhd.pool[l];
+      auto &nhood_o = graph_[nn.id];  // nn on the other side of the edge
+
+      if (nn.flag) {
+        nn_new.push_back(nn.id);
+        if (nn.distance > nhood_o.pool.back().distance) {
+          LockGuard guard(nhood_o.lock);
+          if(nhood_o.rnn_new.size() < R)nhood_o.rnn_new.push_back(n);
+          else{
+            unsigned int pos = rand() % R;
+            nhood_o.rnn_new[pos] = n;
+          }
+        }
+        nn.flag = false;
+      } else {
+        nn_old.push_back(nn.id);
+        if (nn.distance > nhood_o.pool.back().distance) {
+          LockGuard guard(nhood_o.lock);
+          if(nhood_o.rnn_old.size() < R)nhood_o.rnn_old.push_back(n);
+          else{
+            unsigned int pos = rand() % R;
+            nhood_o.rnn_old[pos] = n;
+          }
+        }
+      }
+    }
+    std::make_heap(nnhd.pool.begin(), nnhd.pool.end());
+  }
+#pragma omp parallel for
+  for (unsigned i = 0; i < nd_; ++i) {
+    auto &nn_new = graph_[i].nn_new;
+    auto &nn_old = graph_[i].nn_old;
+    auto &rnn_new = graph_[i].rnn_new;
+    auto &rnn_old = graph_[i].rnn_old;
+    if (R && rnn_new.size() > R) {
+      std::random_shuffle(rnn_new.begin(), rnn_new.end());
+      rnn_new.resize(R);
+    }
+    nn_new.insert(nn_new.end(), rnn_new.begin(), rnn_new.end());
+    if (R && rnn_old.size() > R) {
+      std::random_shuffle(rnn_old.begin(), rnn_old.end());
+      rnn_old.resize(R);
+    }
+    nn_old.insert(nn_old.end(), rnn_old.begin(), rnn_old.end());
+    if(nn_old.size() > R * 2){nn_old.resize(R * 2);nn_old.reserve(R*2);}
+    std::vector<unsigned>().swap(graph_[i].rnn_new);
+    std::vector<unsigned>().swap(graph_[i].rnn_old);
+  }
+}
+
+void IndexGraph::NNDescent(const Parameters &parameters) {
+  unsigned iter = parameters.Get<unsigned>("iter");
+  std::mt19937 rng(rand());
+  std::vector<unsigned> control_points(_CONTROL_NUM);
+  std::vector<std::vector<unsigned> > acc_eval_set(_CONTROL_NUM);
+  GenRandom(rng, &control_points[0], control_points.size(), nd_);
+  generate_control_set(control_points, acc_eval_set, nd_);
+  for (unsigned it = 0; it < iter; it++) {
+    join();
+    update(parameters);
+    //checkDup();
+    eval_recall(control_points, acc_eval_set);
+    std::cout << "iter: " << it << std::endl;
+  }
+}
+
+
+```
+
+搜索阶段
+```cpp
+
+void IndexGraph::Search(
+    const float *query,
+    const float *x,
+    size_t K,
+    const Parameters &parameter,
+    unsigned *indices) {
+  const unsigned L = parameter.Get<unsigned>("L_search");
+
+  std::vector<Neighbor> retset(L+1);
+  std::vector<unsigned> init_ids(L);
+  std::mt19937 rng(rand());
+  GenRandom(rng, init_ids.data(), L, (unsigned)nd_);
+
+  std::vector<char> flags(nd_);
+  memset(flags.data(), 0, nd_ * sizeof(char));
+  for(unsigned i=0; i<L; i++){
+    unsigned id = init_ids[i];
+    float dist = distance_->compare(data_ + dimension_*id, query, (unsigned)dimension_);
+    retset[i]=Neighbor(id, dist, true);
+  }
+
+  std::sort(retset.begin(), retset.begin()+L);
+  int k=0;
+  while(k < (int)L) {
+    int nk = L;
+
+    if (retset[k].flag) {
+      retset[k].flag = false;
+      unsigned n = retset[k].id;
+
+      for (unsigned m = 0; m < final_graph_[n].size(); ++m) {
+        unsigned id = final_graph_[n][m];
+        if(flags[id])continue;
+        flags[id] = 1;
+        float dist = distance_->compare(query, data_ + dimension_ * id, (unsigned)dimension_);
+        if(dist >= retset[L-1].distance)continue;
+        Neighbor nn(id, dist, true);
+        int r = InsertIntoPool(retset.data(), L, nn);
+
+        //if(L+1 < retset.size()) ++L;
+        if(r < nk)nk=r;
+      }
+      //lock to here
+    }
+    if(nk <= k)k = nk;
+    else ++k;
+  }
+  for(size_t i=0; i < K; i++){
+    indices[i] = retset[i].id;
+  }
+}
+```
 
 ### Experimental 
 
