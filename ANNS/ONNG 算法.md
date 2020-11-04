@@ -120,10 +120,9 @@ BKNNG 入度均大于 20，出度大多小于 TKNNG。
 
 * **提高过低的入度**
 
-
 * 静态度调整
 
-限制图出度入度：
+限制图出度入度, 并构建双向边：
 
 ```cpp
 ConstructAdjustedGraph
@@ -157,8 +156,8 @@ Input: G(V, E), eo, ei
 Output: Ge(Ve, Ee) 
 
 Gt(Vt, Et) ← ConstructAdjustedGraph(G, 0, ei)       // 将 KNNG 转化为 TKNNG Gt
-Ve ← V, Ee ← ∅, Ge ← (Ve, Ee)                       // Ge 仅保留 KNNG 结点
-Vi ← V, Ei ← ∅, Gi ← (Vi, Ei)                       // Gi 仅用于保存 KNNG 结点 和 Ge 入度信息
+Ve ← V, Ee ← ∅, Ge ← (Ve, Ee)                       // Ge 仅保留 KNNG 结点和出度信息
+Vi ← V, Ei ← ∅, Gi ← (Vi, Ei)                       // Gi 仅用于保存 KNNG 结点和入度信息
 M ← V 
 while M != ∅ do
     o ← argmin|N(Gt, x)| (x∈M)                     // 从 Gt 中获取到 x 最近的点 o （o->x）
@@ -264,3 +263,299 @@ ONNG 论文中认为， 在基于图的算法实现中，结点是否访问占�
     #### 
 
     搜索阶段 ： 候选点距离而非查询点距离
+
+
+### ONNG 源码分析
+
+```cpp                                                        
+#include        "NGT/Index.h"
+#include        "NGT/GraphOptimizer.h"
+
+using namespace std;
+int main(int argc, char **argv)
+{
+  NGT::GraphOptimizer   graphOptimizer(false);
+  int numOfOutgoingEdges = 10;
+  int numOfIncomingEdges = 100;
+  int numOfQueries = 200;
+  int numOfResultantObjects = 20; // k                                                                 
+
+  // 设置 ONNG 相关参数       
+  graphOptimizer.set(numOfOutgoingEdges, numOfIncomingEdges, numOfQueries, numOfResultantObjects);  
+  graphOptimizer.execute("fasttext.anng-100", "fasttext.onng");
+  return 0;
+}  
+
+void execute(const std::string inIndexPath, const std::string outIndexPath){
+    
+    ...
+
+    {
+        NGT::GraphIndex graphIndex(outIndexPath, false);
+        if (numOfOutgoingEdges > 0 || numOfIncomingEdges > 0) {
+            ...
+            std::vector<NGT::ObjectDistances> graph;
+            
+            std::cerr << "Optimizer::execute: Extract the graph data." << std::endl;
+            // extract only edges from the index to reduce the memory usage.
+            NGT::GraphReconstructor::extractGraph(graph, graphIndex);
+            // 设置构建 ONNG 相关参数
+            NeighborhoodGraph::Property &prop = graphIndex.getGraphProperty();
+            // 初始图必须为 ANNG
+            if (prop.graphType != NGT::NeighborhoodGraph::GraphTypeANNG) {
+                NGT::GraphReconstructor::convertToANNG(graph);
+            }
+            NGT::GraphReconstructor::reconstructGraph(graph, graphIndex, numOfOutgoingEdges, numOfIncomingEdges);
+            
+            ...
+        }
+
+        if (shortcutReduction) {
+            ...
+
+            NGT::GraphReconstructor::adjustPathsEffectively(graphIndex);
+            
+            ...
+        }
+        ...
+    }
+
+    optimizeSearchParameters(outIndexPath);
+}
+
+// 提取图中结点
+static void extractGraph(std::vector<NGT::ObjectDistances> &graph, NGT::GraphIndex &graphIndex) {
+    graph.reserve(graphIndex.repository.size());
+    for (size_t id = 1; id < graphIndex.repository.size(); id++) {
+        ...
+        NGT::GraphNode &node = *graphIndex.getNode(id);
+        graph.push_back(node);
+        ...
+    }
+}
+
+// graph 初始图索引，outGraph 输出图索引（初始状态下只存在图结点），originalEdgeSize 出度，reverseEdgeSize 入度
+static void reconstructGraph(std::vector<NGT::ObjectDistances> &graph, NGT::GraphIndex &outGraph, size_t originalEdgeSize, size_t reverseEdgeSize) {
+    ...
+
+    // 初始化 outGraph 结点
+    for (size_t id = 1; id < outGraph.repository.size(); id++) {
+        ...
+
+        NGT::GraphNode &node = *outGraph.getNode(id);
+        if (originalEdgeSize == 0) {
+            NGT::GraphNode empty;
+            node.swap(empty);
+        } else {
+            NGT::ObjectDistances n = graph[id - 1];
+            if (n.size() < originalEdgeSize) {
+                std::cerr << "GraphReconstructor: Warning. The edges "
+                                "are too few. "
+                            << n.size() << ":" << originalEdgeSize
+                            << " for " << id << std::endl;
+                continue;
+            }
+            n.resize(originalEdgeSize);
+            node.swap(n);
+        }
+        ...
+    }
+    
+    // 构建反向图
+    int insufficientNodeCount = 0;
+    for (size_t id = 1; id <= graph.size(); ++id) {
+        ...
+
+        NGT::ObjectDistances &node = graph[id - 1];
+        size_t rsize = reverseEdgeSize;
+        if (rsize > node.size()) {
+            insufficientNodeCount++;
+            rsize = node.size();
+        }
+        for (size_t i = 0; i < rsize; ++i) {
+            NGT::Distance distance = node[i].distance;
+            size_t nodeID = node[i].id;
+            try {
+                NGT::GraphNode &n = *outGraph.getNode(nodeID);
+                n.push_back(NGT::ObjectDistance(id, distance));
+            } catch (...) {
+            }
+        }
+        ...
+    }
+    if (insufficientNodeCount != 0) {
+        std::cerr << "# of the nodes edges of which are in short = "
+                    << insufficientNodeCount << std::endl;
+    }
+
+    ...
+    for (size_t id = 1; id < outGraph.repository.size(); id++) {
+        ...
+        NGT::GraphNode &n = *outGraph.getNode(id);
+        ...
+        std::sort(n.begin(), n.end());
+#endif
+        NGT::ObjectID prev = 0;
+        for (auto it = n.begin(); it != n.end();) {
+            if (prev == (*it).id) {
+                it = n.erase(it);
+                continue;
+            }
+            prev = (*it).id;
+            it++;
+        }
+#if !defined(NGT_SHARED_MEMORY_ALLOCATOR)
+        NGT::GraphNode tmp = n;
+        n.swap(tmp);
+#endif
+        ...
+    }
+    
+    ...
+}
+```
+
+```cpp
+static void adjustPathsEffectively(NGT::GraphIndex &outGraph) {
+    ...
+    std::vector<NGT::GraphNode> tmpGraph;
+    for (size_t id = 1; id < outGraph.repository.size(); id++) {
+        ...
+        NGT::GraphNode &node = *outGraph.getNode(id);
+        tmpGraph.push_back(node);
+        node.clear();
+        ...
+    }
+    ...
+
+    // 待删除结点候选集
+    std::vector<std::vector<std::pair<uint32_t, uint32_t>>> removeCandidates(tmpGraph.size());
+    int removeCandidateCount = 0;
+    // 并行遍历图索引
+#pragma omp parallel for
+    for (size_t idx = 0; idx < tmpGraph.size(); ++idx) {
+        auto it = tmpGraph.begin() + idx;
+        size_t id = idx + 1;
+
+        // 获取结点近邻
+        NGT::GraphNode &srcNode = *it;
+        // 保存结点 id 和 近邻 id 及距离的关系
+        std::unordered_map<uint32_t, std::pair<size_t, double>> neighbors;
+        for (size_t sni = 0; sni < srcNode.size(); ++sni) {
+            neighbors[srcNode[sni].id] = std::pair<size_t, double>(sni, srcNode[sni].distance);
+        }
+
+        // 当前结点待删除结点
+        std::vector<std::pair<int, std::pair<uint32_t, uint32_t>>> candidates;
+        // 遍历近邻
+        for (size_t sni = 0; sni < srcNode.size(); sni++) {
+            NGT::GraphNode &pathNode = tmpGraph[srcNode[sni].id - 1];
+            // 遍历近邻的近邻，寻找可删除结点（三角形）
+            for (size_t pni = 0; pni < pathNode.size(); pni++) {
+                auto dstNodeID = pathNode[pni].id;
+                auto dstNode = neighbors.find(dstNodeID);
+                if (dstNode != neighbors.end() &&
+                    srcNode[sni].distance < (*dstNode).second.second &&
+                    pathNode[pni].distance < (*dstNode).second.second) {
+                    candidates.push_back(
+                        std::pair<int, std::pair<uint32_t, uint32_t>>(
+                            (*dstNode).second.first,
+                            std::pair<uint32_t, uint32_t>(
+                                srcNode[sni].id, dstNodeID)));
+                    removeCandidateCount++;
+                }
+            }
+        }
+        // 推入总删除结点
+        sort(candidates.begin(), candidates.end(), std::greater<std::pair<int, std::pair<uint32_t, uint32_t>>>());
+        removeCandidates[id - 1].reserve(candidates.size());
+        for (size_t i = 0; i < candidates.size(); i++) {
+            removeCandidates[id - 1].push_back(candidates[i].second);
+        }
+    }
+    ...
+
+    std::list<size_t> ids;
+    for (size_t idx = 0; idx < tmpGraph.size(); ++idx) {
+        ids.push_back(idx + 1);
+    }
+
+    int removeCount = 0;
+    removeCandidateCount = 0;
+    for (size_t rank = 0; ids.size() != 0; rank++) {
+        for (auto it = ids.begin(); it != ids.end();) {
+            size_t id = *it;
+            size_t idx = id - 1;
+            // 获取当前结点近邻 srcNode
+            NGT::GraphNode &srcNode = tmpGraph[idx];
+            // ?
+            if (rank >= srcNode.size()) {
+                if (!removeCandidates[idx].empty()) {
+                    std::cerr << "Something wrong! ID=" << id
+                                << " # of remaining candidates="
+                                << removeCandidates[idx].size()
+                                << std::endl;
+                    abort();
+                }
+                NGT::GraphNode empty;
+                tmpGraph[idx] = empty;
+                it = ids.erase(it);
+                continue;
+            }
+            if (removeCandidates[idx].size() > 0) {
+                removeCandidateCount++;
+                bool pathExist = false;
+                while (!removeCandidates[idx].empty() &&
+                        (removeCandidates[idx].back().second ==
+                        srcNode[rank].id)) {
+                    size_t path = removeCandidates[idx].back().first;
+                    size_t dst = removeCandidates[idx].back().second;
+                    removeCandidates[idx].pop_back();
+                    if (removeCandidates[idx].empty()) {
+                        std::vector<std::pair<uint32_t, uint32_t>> empty;
+                        removeCandidates[idx] = empty;
+                    }
+                    if ((hasEdge(outGraph, id, path)) && (hasEdge(outGraph, path, dst))) {
+                        pathExist = true;
+                        while (!removeCandidates[idx].empty() &&
+                                (removeCandidates[idx].back().second ==
+                                srcNode[rank].id)) {
+                            removeCandidates[idx].pop_back();
+                            if (removeCandidates[idx].empty()) {
+                                std::vector<std::pair<uint32_t, uint32_t>> empty;
+                                removeCandidates[idx] = empty;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (pathExist) {
+                    removeCount++;
+                    it++;
+                    continue;
+                }
+            }
+            NGT::GraphNode &outSrcNode = *outGraph.getNode(id);
+            insert(outSrcNode, srcNode[rank].id, srcNode[rank].distance);
+            it++;
+        }
+    }
+
+    // 后续处理 ： 排序
+    for (size_t id = 1; id < outGraph.repository.size(); id++) {
+        try {
+            NGT::GraphNode &node = *outGraph.getNode(id);
+            std::sort(node.begin(), node.end());
+        } catch (...) {
+        }
+    }
+}
+
+static bool hasEdge(NGT::GraphIndex &graph, size_t srcNodeID, size_t dstNodeID) {
+    NGT::GraphNode &srcNode = *graph.getNode(srcNodeID);
+    GraphNode::iterator ni =
+        std::lower_bound(srcNode.begin(), srcNode.end(),
+                            ObjectDistance(dstNodeID, 0.0), edgeComp);
+    return (ni != srcNode.end()) && ((*ni).id == dstNodeID);
+}
+```
